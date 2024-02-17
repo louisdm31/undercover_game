@@ -210,7 +210,7 @@ class _VotingScreenState extends State<VotingScreen> {
                 isLatePlayerAdd: true,
                 latePlayerAddCallback: (name) {
                   widget.names.add(name);
-                  widget.roles.add(isUndercover ? 'w' : 'c');
+                  widget.roles.add(isUndercover ? 'u' : 'c');
                   setState(() {});
                 }
               ),
