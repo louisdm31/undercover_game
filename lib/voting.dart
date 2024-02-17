@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'names.dart';
+import 'game_over.dart';
 
 class VotingScreen extends StatefulWidget {
   List<String> names;
@@ -85,7 +86,7 @@ class _VotingScreenState extends State<VotingScreen> {
     setState(() {});
   }
 
-  void declareVictory() {
+  void detectWinningTeam() {
     int unrevealedCivilians = 0;
     int unrevealedUndercovers = 0;
     int unrevealedWhite = 0;
@@ -100,30 +101,27 @@ class _VotingScreenState extends State<VotingScreen> {
           unrevealedWhite++;
       }
     }
-    if (unrevealedUndercovers == 0 && unrevealedWhite == 0)
+    if (((unrevealedCivilians <= unrevealedUndercovers) || unrevealedUndercovers == 0) && unrevealedWhite == 0)
     {
-      revealAll();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Game over'),
-            content: Text('victoire des civils'),
-          );
-        },
-      );
-    }
-    if (unrevealedCivilians <= unrevealedUndercovers && unrevealedWhite == 0)
-    {
-      revealAll();
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Game over'),
-            content: Text('victoire des undercovers'),
-          );
-        },
+      String winner;
+      if (unrevealedCivilians == 0 && unrevealedUndercovers == 0)
+        winner = 'n';
+      else if (unrevealedUndercovers == 0)
+        winner = 'c';
+      else
+        winner = 'u';
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GameOverScreen(
+            names: widget.names,
+            roles: widget.roles,
+            civilianWord: widget.civilianWord,
+            undercoverWord: widget.undercoverWord,
+            winner: winner,
+          ),
+        ),
       );
     }
   }
@@ -154,7 +152,7 @@ class _VotingScreenState extends State<VotingScreen> {
 
 
               if (role != 'w')
-                declareVictory();
+                detectWinningTeam();
 
             }
           });
@@ -248,10 +246,22 @@ class _VotingScreenState extends State<VotingScreen> {
                 Navigator.of(context).pop();
                 bool isCorrect = guessWord == widget.civilianWord;
                 if (isCorrect)
-                  revealAll();
+                {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GameOverScreen(
+                        names: widget.names,
+                        roles: widget.roles,
+                        civilianWord: widget.civilianWord,
+                        undercoverWord: widget.undercoverWord,
+                        winner: 'w',
+                      ),
+                    ),
+                  );
+                }
                 else
-                  declareVictory();
-                _displayGuessResult(context, isCorrect, widget.civilianWord, widget.undercoverWord);
+                  _displayGuessResult(context, isCorrect, widget.civilianWord, widget.undercoverWord);
               },
             ),
           ],
@@ -266,14 +276,13 @@ class _VotingScreenState extends State<VotingScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Guess Result"),
-          content: Text(isCorrect ?
-            "Félicitation ! Le mot des undercovers était $undercoverWord" :
-            "Raté ! Le mot des civils était $civilianWord et celui des undercovers était $undercoverWord"),
+          content: Text("Raté ! Le mot des civils était $civilianWord et celui des undercovers était $undercoverWord"),
           actions: <Widget>[
             TextButton(
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
+                detectWinningTeam();
               },
             ),
           ],
