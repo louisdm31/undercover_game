@@ -33,6 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => NameSelection(
           numCivilians: _numCivilians,
           numUndercovers: _numUndercovers,
+          isLatePlayerAdd: false,
+          latePlayerAddCallback: (name) => {},
         ),
       ),
     );

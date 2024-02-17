@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'names.dart';
 
 class VotingScreen extends StatefulWidget {
-  final List<String> names;
-  final List<String> roles;
+  List<String> names;
+  List<String> roles;
   String civilianWord;
   String undercoverWord;
 
@@ -18,6 +19,35 @@ class VotingScreen extends StatefulWidget {
   @override
   _VotingScreenState createState() => _VotingScreenState();
 }
+
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final double height;
+  final VoidCallback onButtonPressed;
+
+  const CustomAppBar({
+    Key? key,
+    required this.height,
+    required this.onButtonPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: const Text('Voting Screen'),
+      backgroundColor: Theme.of(context).primaryColor,
+      actions: [
+        IconButton(
+          onPressed: onButtonPressed,
+          icon: Image.asset('assets/add_player.png'),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => Size(double.infinity, height);
+}
+
 
 class _VotingScreenState extends State<VotingScreen> {
   Map<int, String?> revealedRoles = {-1: null};
@@ -154,8 +184,39 @@ class _VotingScreenState extends State<VotingScreen> {
     }).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Voting Screen'),
+      appBar: CustomAppBar(
+        height: kToolbarHeight,
+        onButtonPressed: () {
+          int unrevealedCivilians = 0;
+          int unrevealedUndercovers = 0;
+          for (int i = 0; i < widget.roles.length; i++)
+          {
+            if (!revealedRoles.containsKey(i)) {
+              if (widget.roles[i] == 'c')
+                unrevealedCivilians++;
+              else if (widget.roles[i] == 'u')
+                unrevealedUndercovers++;
+            }
+          }
+          double probabilityUndercover = 1 - 2 * unrevealedUndercovers / unrevealedCivilians;
+          final Random _random = Random();
+          bool isUndercover = _random.nextDouble() < probabilityUndercover;
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NameSelection(
+                numCivilians: (isUndercover ? 0 : 1),
+                numUndercovers: (isUndercover ? 1 : 0),
+                isLatePlayerAdd: true,
+                latePlayerAddCallback: (name) {
+                  widget.names.add(name);
+                  widget.roles.add(isUndercover ? 'w' : 'c');
+                  setState(() {});
+                }
+              ),
+            ),
+          );
+        }
       ),
       body: Center(
         child: SingleChildScrollView(

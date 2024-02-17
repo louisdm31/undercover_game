@@ -11,18 +11,24 @@ Future<String> loadAsset() async {
 class NameSelection extends StatefulWidget {
   final int numCivilians;
   final int numUndercovers;
+  final bool isLatePlayerAdd;
+  final Function(String) latePlayerAddCallback;
 
   const NameSelection({
     Key? key,
     required this.numCivilians,
     required this.numUndercovers,
+    required this.isLatePlayerAdd,
+   required this.latePlayerAddCallback,
   }) : super(key: key);
 
   @override
   _NameSelectionState createState() => _NameSelectionState();
 
   List<String> _generateRoles() {
-    final List<String> roles = <String>['w'];
+    final List<String> roles = <String>[];
+    if (!isLatePlayerAdd)
+        roles.add('w');
     roles.addAll(List.filled(numCivilians, 'c'));
     roles.addAll(List.filled(numUndercovers, 'u'));
     roles.shuffle();
@@ -37,14 +43,14 @@ class _NameSelectionState extends State<NameSelection> {
   final List<String> all_names = [];
   int _currentPlayerIndex = 0;
   late List<String> roles;
-  final defaultNames = ['Alex', 'Corentin', 'Cyrille', 'Dimitri', 'François', 'Louis', 'Lucas', 'Nathan', 'Mathieu', 'Maxime', 'Rachel', 'Robinson', 'Tristan'];
+  final defaultNames = ['Alex', 'Corentin', 'Cyrille', 'Dimitri', 'François', 'Grégoire', 'Louis', 'Lucas', 'Nathan', 'Mathieu', 'Maxime', 'Rachel', 'Robinson', 'Tristan'];
   final String alphabet = 'abcdefghijklmnopqrstuvwxyzéèçêôù';
   final _textController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fillWords();
+    //fillWords();
     roles = widget._generateRoles();
   }
 
@@ -85,18 +91,24 @@ class _NameSelectionState extends State<NameSelection> {
 
 
   void _navigateToVotingScreen() {
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VotingScreen(
-          names: all_names,
-          roles: roles,
-          civilianWord: _civilianWord,
-          undercoverWord: _undercoverWord,
+    if (widget.isLatePlayerAdd)
+    {
+      Navigator.pop(context);
+      widget.latePlayerAddCallback(_selectedName);
+    }
+    else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VotingScreen(
+            names: all_names,
+            roles: roles,
+            civilianWord: _civilianWord,
+            undercoverWord: _undercoverWord,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   void _submitName() async {
