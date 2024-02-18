@@ -1,3 +1,5 @@
+// This file contains the view in which each player can input its name and is assigned a word.
+
 import 'package:flutter/material.dart';
 import 'voting.dart';
 import 'dart:io';
@@ -20,7 +22,7 @@ class NameSelection extends StatefulWidget {
     Key? key,
     required this.numCivilians,
     required this.numUndercovers,
-    required this.isLatePlayerAdd,
+    required this.isLatePlayerAdd,         // The next four parameters are only used in the case where a player joins in the middle of the game.
     required this.latePlayerAddCallback,
     required this.civilianWord,
     required this.undercoverWord,
@@ -29,6 +31,7 @@ class NameSelection extends StatefulWidget {
   @override
   _NameSelectionState createState() => _NameSelectionState();
 
+  // Randomly assigns a role to each player by generating an array of the form ['c', 'w', 'c', 'u', 'c', 'c']
   List<String> _generateRoles() {
     final List<String> roles = <String>[];
     if (!isLatePlayerAdd)
@@ -45,6 +48,8 @@ class _NameSelectionState extends State<NameSelection> {
   final List<String> all_names = [];
   int _currentPlayerIndex = 0;
   late List<String> roles;
+
+  // For now, the name selection view proposes a list of pre-recorded player names which is hard-coded.
   final defaultNames = ['Alex', 'Corentin', 'Cyrille', 'Dimitri', 'François', 'Grégoire', 'Louis', 'Lucas', 'Nathan', 'Mathieu', 'Maxime', 'Rachel', 'Robinson', 'Tristan'];
   final String alphabet = 'abcdefghijklmnopqrstuvwxyzéèçêôù';
   final _textController = TextEditingController();
@@ -61,6 +66,8 @@ class _NameSelectionState extends State<NameSelection> {
     return oldString.substring(0, index) + newChar + oldString.substring(index + 1);
   }
 
+  // This function is used to decipher the pair of words that is read from assets/words.csv.
+  // The words are ciphered with the Cesar cipher so that I can compile the app without seeing the words.
   String decrypt(String text) {
     for (int i = 0; i < text.length; i++)
     {
@@ -72,6 +79,8 @@ class _NameSelectionState extends State<NameSelection> {
     return text;
   }
 
+  // Reads a counter and the corresponding pair of words in assets/words.csv.
+  // The counter is then incremented for the next game.
   void fillWords() async
   {
     final prefs = await SharedPreferences.getInstance();
@@ -92,12 +101,11 @@ class _NameSelectionState extends State<NameSelection> {
     }
   }
 
-
   void _navigateToVotingScreen() {
     if (widget.isLatePlayerAdd)
     {
       Navigator.pop(context);
-      widget.latePlayerAddCallback(_selectedName);
+      widget.latePlayerAddCallback(_selectedName);  // Adds the new player to the view of the voting screen.
     }
     else {
       Navigator.push(
@@ -113,10 +121,12 @@ class _NameSelectionState extends State<NameSelection> {
       );
     }
   }
-
+  
+  // Records player's name and displays a word, in function of its role.
   void _submitName() async {
     if (_selectedName == '0')
     {
+      // This is a special admin feature to reset the counter to 0.
       final prefs = await SharedPreferences.getInstance();
       prefs.setInt('counter', -1);
       showDialog(
@@ -163,7 +173,7 @@ class _NameSelectionState extends State<NameSelection> {
     );
   }
 
-
+  // Displays the list of default player names.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -195,6 +205,8 @@ class _NameSelectionState extends State<NameSelection> {
                     ),
                   )
                   .toList(),
+
+                  // Displays the text field for players whose name is not in the default list.
                   const SizedBox(height: 20),
                   TextField(
                     decoration: InputDecoration(
@@ -224,11 +236,16 @@ class _NameSelectionState extends State<NameSelection> {
   }
 }
 
+// Widget containing a single box with a default player name.
 class ChoiceBox extends StatelessWidget {
   final String name;
   final VoidCallback onTap;
 
-  const ChoiceBox({required this.name, required this.onTap, Key? key}) : super(key: key);
+  const ChoiceBox({
+    required this.name,
+    required this.onTap,
+    Key? key
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,8 @@
+// This is the view displayed when the game is ongoing.
+// It displays the list of players.
+// When a player is voted out, the interface reveal its role.
+// In case the eliminated player is Mr. White, he has the opportunity to guess the word.
+
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'names.dart';
@@ -21,6 +26,7 @@ class VotingScreen extends StatefulWidget {
   _VotingScreenState createState() => _VotingScreenState();
 }
 
+// This is the top bar of the view, with a button to add a player when the game is ongoing.
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final double height;
   final VoidCallback onButtonPressed;
@@ -57,6 +63,10 @@ class _VotingScreenState extends State<VotingScreen> {
   @override
   void initState() {
     super.initState();
+
+    // When the game starts, the app displays the player that starts each round.
+    // A player is randomly picked, such that, with high probability, Mr. White is among the last players to play.
+    // It has therefore the opportunity to listen to other player's words and make an educated guess of the civilian's word.
     final Random _random = Random();
     int white = widget.roles.indexOf('w');
     int firstPlayer = min(_random.nextInt(widget.roles.length - 2), _random.nextInt(widget.roles.length - 2));
@@ -67,26 +77,14 @@ class _VotingScreenState extends State<VotingScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('premier joueur : $nameFirst'),
+            title: Text('First player : $nameFirst'),
           );
         },
       );
     });
   }
 
-  void revealAll() {
-    for (int i = 0; i < widget.roles.length; i++)
-    {
-      if (widget.roles[i] == 'w')
-        revealedRoles[i] = 'Mr. White';
-      if (widget.roles[i] == 'u')
-        revealedRoles[i] = 'undercover';
-      if (widget.roles[i] == 'c')
-        revealedRoles[i] = 'civil';
-    }
-    setState(() {});
-  }
-
+  // Checks winning conditions for civilians and undercovers.
   void detectWinningTeam() {
     int unrevealedCivilians = 0;
     int unrevealedUndercovers = 0;
@@ -106,7 +104,7 @@ class _VotingScreenState extends State<VotingScreen> {
     {
       String winner;
       if (unrevealedCivilians == 0 && unrevealedUndercovers == 0)
-        winner = 'n';
+        winner = 'n';   // Nobody wins. Mr. White has eliminated all players but failed to guess the word.
       else if (unrevealedUndercovers == 0)
         winner = 'c';
       else
@@ -130,7 +128,8 @@ class _VotingScreenState extends State<VotingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //revealedRoles[-1] = null; // Force the map to re-render the views.
+
+    // constructs the list of boxes corresponding to each player.
     final List<Widget> playerBoxes = widget.names.asMap().entries.map((entry) {
       final nameIndex = entry.key;
       final name = entry.value;
@@ -139,6 +138,9 @@ class _VotingScreenState extends State<VotingScreen> {
       return InkWell(
         onTap: () {
           setState(() {
+
+            // This code is executed when a player is voted out.
+            // Its role is revealed.
             if ( ! revealedRoles.containsValue(nameIndex))
             {
               if (role == 'w')
@@ -150,7 +152,7 @@ class _VotingScreenState extends State<VotingScreen> {
               if (role == 'u')
                 revealedRoles[nameIndex] = 'undercover';
               if (role == 'c')
-                revealedRoles[nameIndex] = 'civil';
+                revealedRoles[nameIndex] = 'civilian';
 
 
               if (role != 'w')
@@ -174,7 +176,7 @@ class _VotingScreenState extends State<VotingScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Role: ${revealedRoles[nameIndex] ?? '[toujours en vie]'}',
+                'Role: ${revealedRoles[nameIndex] ?? '[still alive]'}',
                 style: const TextStyle(fontSize: 16),
               ),
             ],
@@ -187,6 +189,9 @@ class _VotingScreenState extends State<VotingScreen> {
       appBar: CustomAppBar(
         height: kToolbarHeight,
         onButtonPressed: () {
+          
+          // This code is executed when the user tries to add a player during the game.
+          // The new player will be either civilian of undercover, according to a probability distribution constructed below.
           int unrevealedCivilians = 0;
           int unrevealedUndercovers = 0;
           for (int i = 0; i < widget.roles.length; i++)
@@ -201,6 +206,8 @@ class _VotingScreenState extends State<VotingScreen> {
           double probabilityUndercover = 1 - 2 * unrevealedUndercovers / unrevealedCivilians;
           final Random _random = Random();
           bool isUndercover = _random.nextDouble() < probabilityUndercover;
+
+          // Pushes the name selection view.
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -211,6 +218,8 @@ class _VotingScreenState extends State<VotingScreen> {
                 numUndercovers: (isUndercover ? 1 : 0),
                 isLatePlayerAdd: true,
                 latePlayerAddCallback: (name) {
+
+                  // Callback function that adds the new player to the voting screen view.
                   widget.names.add(name);
                   widget.roles.add(isUndercover ? 'u' : 'c');
                   setState(() {});
@@ -247,9 +256,9 @@ class _VotingScreenState extends State<VotingScreen> {
               child: const Text("Submit"),
               onPressed: () {
                 Navigator.of(context).pop();
-                bool isCorrect = guessWord == widget.civilianWord;
-                if (isCorrect)
+                if (guessWord.trim() == widget.civilianWord)
                 {
+                  // If successful, go to game over screen
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -258,14 +267,14 @@ class _VotingScreenState extends State<VotingScreen> {
                         roles: widget.roles,
                         civilianWord: widget.civilianWord,
                         undercoverWord: widget.undercoverWord,
-                        whiteWord: guessWord,
+                        whiteWord: guessWord.trim(),
                         winner: 'w',
                       ),
                     ),
                   );
                 }
-                else
-                  _displayGuessResult(context, isCorrect, widget.civilianWord, widget.undercoverWord);
+                else   // Displays the two words to Mr. White.
+                  _displayGuessResult(context, widget.civilianWord, widget.undercoverWord);
               },
             ),
           ],
@@ -274,19 +283,19 @@ class _VotingScreenState extends State<VotingScreen> {
     );
   }
 
-  void _displayGuessResult(BuildContext context, bool isCorrect, String civilianWord, String undercoverWord) {
+  void _displayGuessResult(BuildContext context, String civilianWord, String undercoverWord) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text("Guess Result"),
-          content: Text("Raté ! Le mot des civils était $civilianWord et celui des undercovers était $undercoverWord"),
+          content: Text("You missed ! Civilian's word is $civilianWord and undercover's word is $undercoverWord"),
           actions: <Widget>[
             TextButton(
               child: const Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();
-                detectWinningTeam();
+                detectWinningTeam();   // Detect a victory of civilians and undercovers.
               },
             ),
           ],

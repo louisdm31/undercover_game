@@ -1,3 +1,6 @@
+// This file contains the first screen of the app.
+// It is composed of two cursors that are used to choose the number of civilians and undercovers.
+
 import 'package:flutter/material.dart';
 import 'names.dart';
 
@@ -26,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _numCivilians = 1;
   int _numUndercovers = 1;
 
+  // this function is called when the user validates the number of players
   void _navigateToNameSelection() {
     Navigator.push(
       context,

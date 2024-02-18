@@ -1,3 +1,5 @@
+// This is the game over view, that reveals the winning team, the teams and their words.
+
 import 'package:flutter/material.dart';
 
 class GameOverScreen extends StatefulWidget {
@@ -22,6 +24,9 @@ class GameOverScreen extends StatefulWidget {
   _GameOverScreenState createState() => _GameOverScreenState();
 }
 
+// This widget corresponds to a team.
+// It displays the list of the players in the team, the corresponding word (for Mr. White, it displays its guess).
+// A crown icon is added to the winning team.
 class TwoStringsWidget extends StatelessWidget {
   final String label1;
   final String label2;
@@ -77,13 +82,13 @@ class _GameOverScreenState extends State<GameOverScreen> {
   @override
   Widget build(BuildContext context) {
 
-    String title = 'Tout le monde a perdu';
+    String title = 'Nobody wins';
     if (widget.winner == 'w')
-      title = 'Victoire de Mr. White';
+      title = 'The winner is Mr. White';
     else if (widget.winner == 'c')
-      title = 'Victoire des civils';
+      title = 'Civilians win';
     else if (widget.winner == 'u')
-      title = 'Victoire des undercover';
+      title = 'Undercovers win';
 
     String civilianNames = '';
     String undercoverNames = '';
@@ -110,17 +115,17 @@ class _GameOverScreenState extends State<GameOverScreen> {
           child: Column(
             children: [
               TwoStringsWidget(
-                label1: 'mot des civils:\n"' + widget.civilianWord + '"',
+                label1: 'Civilian word:\n"' + widget.civilianWord + '"',
                 label2: civilianNames,
                 winner: widget.winner == 'c',
               ),
               TwoStringsWidget(
-                label1: 'mot des imposteurs:\n"' + widget.undercoverWord + '"',
+                label1: 'Undercover word:\n"' + widget.undercoverWord + '"',
                 label2: undercoverNames,
                 winner: widget.winner == 'u',
               ),
               TwoStringsWidget(
-                label1: 'proposition de Mr. White:\n"' + widget.whiteWord + '"',
+                label1: 'Mr. White\'s guess:\n"' + widget.whiteWord + '"',
                 label2: whiteName,
                 winner: widget.winner == 'w',
               ),
@@ -129,6 +134,7 @@ class _GameOverScreenState extends State<GameOverScreen> {
         ),
       ),
       onWillPop: () async {
+        // If the back arrow is pressed, return to the home screen.
         Navigator.popUntil(context, ModalRoute.withName('/'));
         return false;
       },
