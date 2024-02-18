@@ -8,7 +8,7 @@ Undercover is a funny game for 5-10 players.
 The players are grouped into three teams:
 * Civilians. A majority of players are civilians.
 * Undercovers. A small minority of players are undercover.
-* Mr. White, which is always a single player.
+* One player is chosen to be Mr. White.
 
 The app assigns a certain word to each civilian and a different word to each undercover.
 No word is assigned to Mr. White.
