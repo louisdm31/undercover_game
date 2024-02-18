@@ -40,13 +40,13 @@ class TwoStringsWidget extends StatelessWidget {
     Widget crown;
     if (winner)
       crown = Container(
-        height: 70,
+        height: 200,
         width: 70,
         child: Image.asset('assets/crown.png'),
       );
     else
       crown = Container(
-        height: 70,
+        height: 200,
         width: 70,
       );
 
