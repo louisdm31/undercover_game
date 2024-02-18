@@ -31,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => NameSelection(
+          civilianWord: 'foo',
+          undercoverWord: 'bar',
           numCivilians: _numCivilians,
           numUndercovers: _numUndercovers,
           isLatePlayerAdd: false,

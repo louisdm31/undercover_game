@@ -52,6 +52,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
 class _VotingScreenState extends State<VotingScreen> {
   Map<int, String?> revealedRoles = {-1: null};
+  String guessWord = '';
 
   @override
   void initState() {
@@ -119,6 +120,7 @@ class _VotingScreenState extends State<VotingScreen> {
             roles: widget.roles,
             civilianWord: widget.civilianWord,
             undercoverWord: widget.undercoverWord,
+            whiteWord: guessWord,
             winner: winner,
           ),
         ),
@@ -203,6 +205,8 @@ class _VotingScreenState extends State<VotingScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => NameSelection(
+                civilianWord: widget.civilianWord,
+                undercoverWord: widget.undercoverWord,
                 numCivilians: (isUndercover ? 0 : 1),
                 numUndercovers: (isUndercover ? 1 : 0),
                 isLatePlayerAdd: true,
@@ -227,7 +231,6 @@ class _VotingScreenState extends State<VotingScreen> {
   }
 
   void _mrWhiteGuessDialog(BuildContext context) {
-    String guessWord = "toto";
     showDialog(
       context: context,
       builder: (context) {
@@ -255,6 +258,7 @@ class _VotingScreenState extends State<VotingScreen> {
                         roles: widget.roles,
                         civilianWord: widget.civilianWord,
                         undercoverWord: widget.undercoverWord,
+                        whiteWord: guessWord,
                         winner: 'w',
                       ),
                     ),

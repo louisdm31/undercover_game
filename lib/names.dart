@@ -13,13 +13,17 @@ class NameSelection extends StatefulWidget {
   final int numUndercovers;
   final bool isLatePlayerAdd;
   final Function(String) latePlayerAddCallback;
+  String civilianWord;
+  String undercoverWord;
 
-  const NameSelection({
+  NameSelection({
     Key? key,
     required this.numCivilians,
     required this.numUndercovers,
     required this.isLatePlayerAdd,
-   required this.latePlayerAddCallback,
+    required this.latePlayerAddCallback,
+    required this.civilianWord,
+    required this.undercoverWord,
   }) : super(key: key);
 
   @override
@@ -38,8 +42,6 @@ class NameSelection extends StatefulWidget {
 
 class _NameSelectionState extends State<NameSelection> {
   String _selectedName = '';
-  String _civilianWord = "foo";
-  String _undercoverWord = "bar";
   final List<String> all_names = [];
   int _currentPlayerIndex = 0;
   late List<String> roles;
@@ -50,7 +52,8 @@ class _NameSelectionState extends State<NameSelection> {
   @override
   void initState() {
     super.initState();
-    //fillWords();
+    if (!widget.isLatePlayerAdd)
+      fillWords();
     roles = widget._generateRoles();
   }
 
@@ -81,8 +84,8 @@ class _NameSelectionState extends State<NameSelection> {
 
 
       if (rows.isNotEmpty && rows[0].length >= 2) {
-        _civilianWord = decrypt(first[0]);
-        _undercoverWord = decrypt(first[1]);
+        widget.civilianWord = decrypt(first[0]);
+        widget.undercoverWord = decrypt(first[1]);
       }
     } catch (e) {
       print('Error reading CSV: $e');
@@ -103,8 +106,8 @@ class _NameSelectionState extends State<NameSelection> {
           builder: (context) => VotingScreen(
             names: all_names,
             roles: roles,
-            civilianWord: _civilianWord,
-            undercoverWord: _undercoverWord,
+            civilianWord: widget.civilianWord,
+            undercoverWord: widget.undercoverWord,
           ),
         ),
       );
@@ -135,7 +138,7 @@ class _NameSelectionState extends State<NameSelection> {
     if (role == 'w') {
       word = 'You are Mr. White';
     } else {
-      word = 'Your word is ${role == 'c' ? _civilianWord : _undercoverWord}';
+      word = 'Your word is ${role == 'c' ? widget.civilianWord : widget.undercoverWord}';
     }
 
     showDialog(
