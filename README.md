@@ -1,4 +1,4 @@
-# Undercover game
+# Undercover
 
 This repo is a simple android app that implements the "undercover" role-playing game.
 
@@ -9,6 +9,7 @@ The players are grouped into three teams:
 * Civilians. A majority of players are civilians.
 * Undercovers. A small minority of players are undercover.
 * Mr. White, which is always a single player.
+
 The app assigns a certain word to each civilian and a different word to each undercover.
 No word is assigned to Mr. White.
 A non-Mr. White player has initially no way to know whether he is civilian or undercover.
@@ -21,7 +22,7 @@ For civilians, the point is choosing a word that convinces other civilians that 
 in order to eliminate non-civilians, without letting Mr. White guess their word.
 For undercover players, the point is deceive civilians in order remain alive and eventually outnumber civilians.
 
-## Getting Started with flutter
+## Getting Started with Flutter
 
 This project is a starting point for a Flutter application.
 
