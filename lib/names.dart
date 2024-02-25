@@ -178,60 +178,58 @@ class _NameSelectionState extends State<NameSelection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Role-playing Game"),
+        title: Text("Submit your name"),
       ),
-      body: Center(
-        child:
-          SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [ ...defaultNames
-                  .map(
-                    (name) => Column(
-                      children: [
-                        SizedBox(
-                          height: 30,
-                          child:
-                          ChoiceBox(
-                            name: name,
-                            onTap: () {
-                              setState(() => _selectedName = name);
-                              _submitName();
-                            },
-                          ),
+      body: 
+        SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [ ...defaultNames
+                .map(
+                  (name) => Column(
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        child:
+                        ChoiceBox(
+                          name: name,
+                          onTap: () {
+                            setState(() => _selectedName = name);
+                            _submitName();
+                          },
                         ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                  )
-                  .toList(),
+                      ),
+                      const SizedBox(height: 10),
+                    ],
+                  ),
+                )
+                .toList(),
 
-                  // Displays the text field for players whose name is not in the default list.
-                  const SizedBox(height: 20),
-                  TextField(
-                    decoration: InputDecoration(
-                      hintText: 'Custom Name',
-                      labelText: 'Or enter a custom name',
-                      prefixIcon: const Icon(Icons.person),
-                    ),
-                    onChanged: (value) {
-                      _selectedName = value;
-                    },
-                    controller: _textController,
+                // Displays the text field for players whose name is not in the default list.
+                const SizedBox(height: 20),
+                TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Custom Name',
+                    labelText: 'Or enter a custom name',
+                    prefixIcon: const Icon(Icons.person),
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      _submitName();
-                      _textController.clear();
-                    },
-                    child: const Text('Submit'),
-                  ),
-                  const SizedBox(height: 20),
-                ],
-            ),
+                  onChanged: (value) {
+                    _selectedName = value;
+                  },
+                  controller: _textController,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    _submitName();
+                    _textController.clear();
+                  },
+                  child: const Text('Submit'),
+                ),
+                const SizedBox(height: 20),
+              ],
           ),
-      ),
+        ),
     );
   }
 }

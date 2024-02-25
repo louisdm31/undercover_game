@@ -229,11 +229,9 @@ class _VotingScreenState extends State<VotingScreen> {
           );
         }
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            children: playerBoxes,
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: playerBoxes,
         ),
       ),
     );
