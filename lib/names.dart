@@ -5,6 +5,7 @@ import 'voting.dart';
 import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'database_helper.dart';
 
 Future<String> loadAsset() async {
   return await rootBundle.loadString('assets/words.csv');
@@ -50,7 +51,9 @@ class _NameSelectionState extends State<NameSelection> {
   late List<String> roles;
 
   // For now, the name selection view proposes a list of pre-recorded player names which is hard-coded.
-  final defaultNames = ['Alex', 'Corentin', 'Cyrille', 'Dimitri', 'François', 'Grégoire', 'Louis', 'Lucas', 'Nathan', 'Mathieu', 'Maxime', 'Rachel', 'Robinson', 'Tristan'];
+  // final defaultNames = ['Cam', 'Charlie', 'Dom', 'Gus', 'Jo', 'Margotte', 'Mel', 'Mimi', 'Philippine', 'Sam', 'Tam'];
+  final defaultNames = ['Alex', 'Corentin', 'Cyrille', 'Dimitri', 'Erin', 'François', 'Grégoire', 'Louis', 'Lucas', 'Nathan', 'Mathieu', 'Maxime', 'Rachel', 'Robinson', 'Thibaud', 'Tristan'];
+
   final String alphabet = 'abcdefghijklmnopqrstuvwxyzéèçêôù';
   final _textController = TextEditingController();
 
@@ -124,6 +127,19 @@ class _NameSelectionState extends State<NameSelection> {
   
   // Records player's name and displays a word, in function of its role.
   void _submitName() async {
+    if (_selectedName.length > 1 && _selectedName.substring(0, 2) == "##") {
+      final db = DatabaseHelper();
+      String queryResult = await db.executeQuery(_selectedName.substring(2));
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(queryResult),
+          );
+        },
+      );
+      return;
+    }
     if (_selectedName == '0')
     {
       // This is a special admin feature to reset the counter to 0.
@@ -215,6 +231,10 @@ class _NameSelectionState extends State<NameSelection> {
                   ),
                   onChanged: (value) {
                     _selectedName = value;
+                  },
+                  onSubmitted: (value) {
+                    _submitName();
+                    _textController.clear();
                   },
                   controller: _textController,
                 ),

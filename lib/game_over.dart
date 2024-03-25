@@ -1,6 +1,7 @@
 // This is the game over view, that reveals the winning team, the teams and their words.
 
 import 'package:flutter/material.dart';
+import 'database_helper.dart';
 
 class GameOverScreen extends StatefulWidget {
   final List<String> names;
@@ -9,11 +10,13 @@ class GameOverScreen extends StatefulWidget {
   final String undercoverWord;
   final String whiteWord;
   final String winner;
+  final List<bool> survived;
 
   const GameOverScreen({
     Key? key,
     required this.names,
     required this.roles,
+    required this.survived,
     required this.civilianWord,
     required this.undercoverWord,
     required this.whiteWord,
@@ -81,6 +84,13 @@ class TwoStringsWidget extends StatelessWidget {
 class _GameOverScreenState extends State<GameOverScreen> {
   @override
   Widget build(BuildContext context) {
+
+    List<bool> winningPlayers = <bool>[];
+    for (int i = 0; i < widget.roles.length; i++)
+        winningPlayers.add((widget.roles[i] == 'w' && widget.winner == 'w') || (widget.survived[i] && widget.roles[i] == widget.winner));
+
+    final db = DatabaseHelper();
+    db.insertResults(widget.civilianWord, widget.undercoverWord, widget.whiteWord, widget.names, widget.roles, winningPlayers);
 
     String title = 'Nobody wins';
     if (widget.winner == 'w')

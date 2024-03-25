@@ -89,6 +89,7 @@ class _VotingScreenState extends State<VotingScreen> {
     int unrevealedCivilians = 0;
     int unrevealedUndercovers = 0;
     int unrevealedWhite = 0;
+    List<bool> survivors = <bool>[];
     for (int i = 0; i < widget.roles.length; i++)
     {
       if (!revealedRoles.containsKey(i)) {
@@ -98,7 +99,10 @@ class _VotingScreenState extends State<VotingScreen> {
           unrevealedUndercovers++;
         else if (widget.roles[i] == 'w')
           unrevealedWhite++;
+        survivors.add(true);
       }
+      else
+        survivors.add(false);
     }
     if (((unrevealedCivilians <= unrevealedUndercovers) || unrevealedUndercovers == 0) && unrevealedWhite == 0)
     {
@@ -116,6 +120,7 @@ class _VotingScreenState extends State<VotingScreen> {
           builder: (context) => GameOverScreen(
             names: widget.names,
             roles: widget.roles,
+            survived: survivors,
             civilianWord: widget.civilianWord,
             undercoverWord: widget.undercoverWord,
             whiteWord: guessWord,
@@ -230,8 +235,10 @@ class _VotingScreenState extends State<VotingScreen> {
         }
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: playerBoxes,
+        child: Center(
+          child:Column(
+            children: playerBoxes,
+          ),
         ),
       ),
     );
@@ -263,6 +270,7 @@ class _VotingScreenState extends State<VotingScreen> {
                       builder: (context) => GameOverScreen(
                         names: widget.names,
                         roles: widget.roles,
+                        survived: List<bool>.filled(widget.names.length, false),
                         civilianWord: widget.civilianWord,
                         undercoverWord: widget.undercoverWord,
                         whiteWord: guessWord.trim(),
